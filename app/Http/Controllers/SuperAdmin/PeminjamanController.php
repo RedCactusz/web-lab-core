@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers\SuperAdmin;
+
+use App\Http\Controllers\Controller;
+use App\Entities\Peminjaman;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+class PeminjamanController extends Controller
+{
+    public function index(): JsonResponse
+    {
+        return response()->json(Peminjaman::with('mahasiswa')->orderByDesc('created_at')->get());
+    }
+
+    public function show($id): JsonResponse
+    {
+        $peminjaman = Peminjaman::with('mahasiswa')->findOrFail($id);
+        return response()->json($peminjaman);
+    }
+
+    public function update(Request $request, $id): JsonResponse
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,approved,decline,completed,miss',
+            'revisi_catatan' => 'nullable|string',
+            'revised_items' => 'nullable|array',
+            'pengembalian_catatan' => 'nullable|string',
+            'pengembalian_items' => 'nullable|array',
+            'tanggal_dikembalikan' => 'nullable|date',
+        ]);
+
+        $peminjaman->update($validated);
+
+        return response()->json($peminjaman);
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->delete();
+
+        return response()->json(['message' => 'Peminjaman berhasil dihapus']);
+    }
+}
