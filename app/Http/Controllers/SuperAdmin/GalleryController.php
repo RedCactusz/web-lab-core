@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\GalleryItem;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\GalleryRequest;
 use Illuminate\Http\JsonResponse;
 
 class GalleryController extends Controller
@@ -14,14 +14,9 @@ class GalleryController extends Controller
         return $this->successResponse(GalleryItem::orderBy('created_at', 'desc')->get(), 'Gallery retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(GalleryRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'image' => 'required|string',
-            'description' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $gallery = GalleryItem::create($validated);
 
@@ -34,16 +29,11 @@ class GalleryController extends Controller
         return $this->successResponse($gallery, 'Gallery retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(GalleryRequest $request, $id): JsonResponse
     {
         $gallery = GalleryItem::findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'image' => 'required|string',
-            'description' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $gallery->update($validated);
 

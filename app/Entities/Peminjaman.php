@@ -2,13 +2,14 @@
 
 namespace App\Entities;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Peminjaman extends Model
 {
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $table = 'peminjaman';
 

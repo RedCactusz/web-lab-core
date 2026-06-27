@@ -2,12 +2,13 @@
 
 namespace App\Entities;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Inventaris extends Model
 {
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $table = 'inventaris';
 

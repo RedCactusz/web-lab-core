@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Inventaris;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\InventarisRequest;
 use Illuminate\Http\JsonResponse;
 
 class InventarisController extends Controller
@@ -14,20 +14,9 @@ class InventarisController extends Controller
         return $this->successResponse(Inventaris::orderBy('nama')->get(), 'Inventaris retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(InventarisRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'kode_alat' => 'required|string|unique:inventaris,kode_alat',
-            'nama' => 'required|string',
-            'kategori' => 'required|in:surveying,aksesoris,perlengkapan,lainnya',
-            'merk' => 'nullable|string',
-            'tipe' => 'nullable|string',
-            'kondisi' => 'required|in:baik,rusak_ringan,rusak_berat,maintenance',
-            'jumlah' => 'required|integer|min:0',
-            'lokasi' => 'nullable|string',
-            'keterangan' => 'nullable|string',
-            'foto' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         $inventaris = Inventaris::create($validated);
 
@@ -40,22 +29,11 @@ class InventarisController extends Controller
         return $this->successResponse($inventaris, 'Inventaris retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(InventarisRequest $request, $id): JsonResponse
     {
         $inventaris = Inventaris::findOrFail($id);
 
-        $validated = $request->validate([
-            'kode_alat' => 'required|string|unique:inventaris,kode_alat,' . $id,
-            'nama' => 'required|string',
-            'kategori' => 'required|in:surveying,aksesoris,perlengkapan,lainnya',
-            'merk' => 'nullable|string',
-            'tipe' => 'nullable|string',
-            'kondisi' => 'required|in:baik,rusak_ringan,rusak_berat,maintenance',
-            'jumlah' => 'required|integer|min:0',
-            'lokasi' => 'nullable|string',
-            'keterangan' => 'nullable|string',
-            'foto' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         $inventaris->update($validated);
 

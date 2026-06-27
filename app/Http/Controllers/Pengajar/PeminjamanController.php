@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Pengajar;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Peminjaman;
-use Illuminate\Http\Request;
+use App\Http\Requests\Pengajar\PeminjamanRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
@@ -30,7 +31,7 @@ class PeminjamanController extends Controller
         return $this->successResponse($peminjaman, 'Peminjaman retrieved');
     }
 
-    public function updateStatus(Request $request, $id): JsonResponse
+    public function updateStatus(PeminjamanRequest $request, $id): JsonResponse
     {
         $pengajar = $request->user()->pengajar;
 
@@ -44,14 +45,7 @@ class PeminjamanController extends Controller
             return $this->errorResponse('Anda tidak memiliki akses ke peminjaman ini', 403);
         }
 
-        $validated = $request->validate([
-            'status' => 'required|in:pending,approved,decline,completed,miss',
-            'revisi_catatan' => 'nullable|string',
-            'revised_items' => 'nullable|array',
-            'pengembalian_catatan' => 'nullable|string',
-            'pengembalian_items' => 'nullable|array',
-            'tanggal_dikembalikan' => 'nullable|date',
-        ]);
+        $validated = $request->validated();
 
         $peminjaman->update($validated);
 

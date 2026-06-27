@@ -4,8 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Pengajar;
+use App\Http\Requests\SuperAdmin\PengajarRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -17,18 +17,10 @@ class PengajarController extends Controller
         return $this->successResponse(Pengajar::with('user', 'praktikum')->orderBy('nama_lengkap')->get(), 'Pengajar retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(PengajarRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'nama_lengkap' => 'required|string',
-                'nip'          => 'nullable|string|unique:pengajar,nip',
-                'username'     => 'required|string|unique:users,username',
-                'password'     => 'required|string|min:6',
-                'praktikum'    => 'nullable|string',
-                'plug'         => 'nullable|array',
-                'is_active'    => 'boolean',
-            ]);
+            $validated = $request->validated();
 
             return DB::transaction(function () use ($validated) {
                 $user = User::create([
@@ -65,19 +57,11 @@ class PengajarController extends Controller
         return $this->successResponse($pengajar, 'Pengajar retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(PengajarRequest $request, $id): JsonResponse
     {
         $pengajar = Pengajar::findOrFail($id);
 
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string',
-            'nip'          => 'nullable|string|unique:pengajar,nip,' . $id,
-            'username'     => 'required|string|unique:users,username,' . $pengajar->user_id,
-            'password'     => 'nullable|string|min:6',
-            'praktikum'    => 'nullable|string',
-            'plug'         => 'nullable|array',
-            'is_active'    => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         return DB::transaction(function () use ($pengajar, $validated) {
             $userData = [

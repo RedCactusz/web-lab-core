@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\AgendaItem;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\AgendaRequest;
 use Illuminate\Http\JsonResponse;
 
 class AgendaController extends Controller
@@ -14,15 +14,9 @@ class AgendaController extends Controller
         return $this->successResponse(AgendaItem::orderBy('date', 'asc')->get(), 'Agenda retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(AgendaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $agenda = AgendaItem::create($validated);
 
@@ -35,17 +29,11 @@ class AgendaController extends Controller
         return $this->successResponse($agenda, 'Agenda retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(AgendaRequest $request, $id): JsonResponse
     {
         $agenda = AgendaItem::findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $agenda->update($validated);
 

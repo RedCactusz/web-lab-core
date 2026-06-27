@@ -7,8 +7,8 @@ use App\Http\Controllers\Public\PublicPeminjamanController;
 use App\Http\Controllers\Public\PraktikumSelectorController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login/mahasiswa', [AuthController::class, 'loginMahasiswa']);
-Route::post('/register/mahasiswa', [AuthController::class, 'registerMahasiswa']);
+Route::post('/login/mahasiswa', [AuthController::class, 'loginMahasiswa'])->middleware('throttle:login');
+Route::post('/register/mahasiswa', [AuthController::class, 'registerMahasiswa'])->middleware('throttle:login');
 Route::get('/selector/praktikum', [PraktikumSelectorController::class, 'listPraktikum']);
 
 Route::prefix('public')->group(function () {
