@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
             SuperAdminSeeder::class,
             PraktikumSeeder::class,
             InventarisSeeder::class,
-            // DemoUserSeeder::class,
+            DemoUserSeeder::class,
         ]);
     }
 }

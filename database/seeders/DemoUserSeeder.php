@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Constant\Users\UserRole;
-use App\Constant\Praktikum\PraktikumSlug;
 use App\Entities\Mahasiswa;
 use App\Entities\Pengajar;
 use App\Entities\Praktikum;
@@ -15,19 +14,8 @@ class DemoUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@labsgg.local'],
-            [
-                'name' => 'Admin Lab SGG',
-                'username' => 'admin',
-                'password' => Hash::make('password'),
-                'is_verify' => true,
-            ]
-        );
-        $admin->assignRole(UserRole::ADMIN);
-
-        $praktikumSutris1 = Praktikum::where('slug', PraktikumSlug::SUTRIS1)->first();
-        $praktikumHidro = Praktikum::where('slug', PraktikumSlug::HIDRO)->first();
+        $praktikumSutris1 = Praktikum::where('kode', 'SGG001')->first();
+        $praktikumHidro = Praktikum::where('kode', 'SGG002')->first();
 
         $pengajar1 = User::firstOrCreate(
             ['email' => 'pengajar.sutris1@labsgg.local'],
@@ -46,6 +34,7 @@ class DemoUserSeeder extends Seeder
                 'nama_lengkap' => 'Pengajar Sutris1',
                 'praktikum_slug' => $praktikumSutris1?->slug,
                 'plug' => [1, 2, 3],
+                'is_active' => true,
             ]
         );
 
@@ -66,6 +55,7 @@ class DemoUserSeeder extends Seeder
                 'nama_lengkap' => 'Pengajar Hidro',
                 'praktikum_slug' => $praktikumHidro?->slug,
                 'plug' => [4, 5],
+                'is_active' => true,
             ]
         );
 
@@ -80,7 +70,7 @@ class DemoUserSeeder extends Seeder
         );
         $mhs->assignRole(UserRole::MAHASISWA);
 
-        Mahasiswa::firstOrCreate(
+        $mahasiswa = Mahasiswa::firstOrCreate(
             ['nim' => '12345678'],
             [
                 'user_id' => $mhs->id,
@@ -88,5 +78,11 @@ class DemoUserSeeder extends Seeder
                 'angkatan' => 2024,
             ]
         );
+
+        if ($praktikumSutris1) {
+            $mahasiswa->praktikum()->syncWithoutDetaching([
+                $praktikumSutris1->id => ['kelompok' => 1, 'plug' => 1],
+            ]);
+        }
     }
 }
