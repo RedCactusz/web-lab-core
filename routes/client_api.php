@@ -17,6 +17,7 @@ Route::prefix('public')->group(function () {
     Route::get('/agenda', [PublicContentController::class, 'agenda']);
     Route::get('/partners', [PublicContentController::class, 'partners']);
     Route::get('/kerjasama', [PublicContentController::class, 'kerjasama']);
+    Route::get('/structure', [PublicContentController::class, 'structure']);
 
     Route::get('/inventaris', [PublicPeminjamanController::class, 'inventaris']);
     Route::post('/peminjaman', [PublicPeminjamanController::class, 'store']);

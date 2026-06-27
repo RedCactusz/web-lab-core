@@ -7,6 +7,7 @@ use App\Http\Resources\AgendaResource;
 use App\Http\Resources\GalleryResource;
 use App\Http\Resources\KerjasamaResource;
 use App\Http\Resources\NewsResource;
+use App\Http\Resources\OrganizationStructureResource;
 use App\Http\Resources\PartnerResource;
 use App\Services\Public\PublicContentService;
 use Illuminate\Http\JsonResponse;
@@ -50,5 +51,12 @@ class PublicContentController extends Controller
         $items = $this->publicContentService->getKerjasama();
 
         return $this->successResponse(KerjasamaResource::collection($items), 'Kerjasama retrieved');
+    }
+
+    public function structure(): JsonResponse
+    {
+        $items = $this->publicContentService->getStructure();
+
+        return $this->successResponse(OrganizationStructureResource::collection($items), 'Organization structure retrieved');
     }
 }
