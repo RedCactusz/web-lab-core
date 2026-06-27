@@ -6,6 +6,7 @@ use App\Entities\AgendaItem;
 use App\Entities\GalleryItem;
 use App\Entities\Kerjasama;
 use App\Entities\NewsItem;
+use App\Entities\OrganizationStructure;
 use App\Entities\Partner;
 use Illuminate\Support\Collection;
 
@@ -34,5 +35,10 @@ class PublicContentService
     public function getKerjasama(): Collection
     {
         return Kerjasama::published()->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getStructure(): Collection
+    {
+        return OrganizationStructure::published()->ordered()->get();
     }
 }
