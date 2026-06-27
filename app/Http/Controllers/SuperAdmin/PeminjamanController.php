@@ -11,13 +11,13 @@ class PeminjamanController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Peminjaman::with('mahasiswa')->orderByDesc('created_at')->get());
+        return $this->successResponse(Peminjaman::with('mahasiswa')->orderByDesc('created_at')->get(), 'Peminjaman retrieved');
     }
 
     public function show($id): JsonResponse
     {
         $peminjaman = Peminjaman::with('mahasiswa')->findOrFail($id);
-        return response()->json($peminjaman);
+        return $this->successResponse($peminjaman, 'Peminjaman retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -35,7 +35,7 @@ class PeminjamanController extends Controller
 
         $peminjaman->update($validated);
 
-        return response()->json($peminjaman);
+        return $this->successResponse($peminjaman, 'Peminjaman updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -43,6 +43,6 @@ class PeminjamanController extends Controller
         $peminjaman = Peminjaman::findOrFail($id);
         $peminjaman->delete();
 
-        return response()->json(['message' => 'Peminjaman berhasil dihapus']);
+        return $this->successResponse(null, 'Peminjaman berhasil dihapus');
     }
 }

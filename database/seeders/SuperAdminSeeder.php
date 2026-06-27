@@ -17,7 +17,9 @@ class SuperAdminSeeder extends Seeder
             ['email' => 'admin@lab-sgg.com'],
             [
                 'name' => 'Super Administrator',
+                'username' => 'superadmin',
                 'password' => Hash::make('admin123'),
+                'is_verify' => true,
             ]
         );
 

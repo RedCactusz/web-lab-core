@@ -13,11 +13,12 @@ class PublicPeminjamanController extends Controller
 {
     public function inventaris(): JsonResponse
     {
-        return response()->json(
+        return $this->successResponse(
             Inventaris::select('id', 'kode_alat', 'nama', 'kategori', 'merk', 'tipe', 'kondisi', 'jumlah', 'lokasi')
                 ->where('kondisi', '!=', 'rusak_berat')
                 ->orderBy('nama')
-                ->get()
+                ->get(),
+            'Inventaris retrieved'
         );
     }
 
@@ -52,7 +53,7 @@ class PublicPeminjamanController extends Controller
             'status' => 'pending',
         ]);
 
-        return response()->json($peminjaman, 201);
+        return $this->successResponse($peminjaman, 'Peminjaman created successfully', 201);
     }
 
     public function indexByNim(Request $request): JsonResponse
@@ -67,6 +68,6 @@ class PublicPeminjamanController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return response()->json($peminjaman);
+        return $this->successResponse($peminjaman, 'Peminjaman retrieved');
     }
 }

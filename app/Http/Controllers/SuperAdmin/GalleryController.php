@@ -11,7 +11,7 @@ class GalleryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(GalleryItem::orderBy('created_at', 'desc')->get());
+        return $this->successResponse(GalleryItem::orderBy('created_at', 'desc')->get(), 'Gallery retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -25,13 +25,13 @@ class GalleryController extends Controller
 
         $gallery = GalleryItem::create($validated);
 
-        return response()->json($gallery, 201);
+        return $this->successResponse($gallery, 'Gallery created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $gallery = GalleryItem::findOrFail($id);
-        return response()->json($gallery);
+        return $this->successResponse($gallery, 'Gallery retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -47,7 +47,7 @@ class GalleryController extends Controller
 
         $gallery->update($validated);
 
-        return response()->json($gallery);
+        return $this->successResponse($gallery, 'Gallery updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -55,6 +55,6 @@ class GalleryController extends Controller
         $gallery = GalleryItem::findOrFail($id);
         $gallery->delete();
 
-        return response()->json(['message' => 'Galeri berhasil dihapus']);
+        return $this->successResponse(null, 'Galeri berhasil dihapus');
     }
 }

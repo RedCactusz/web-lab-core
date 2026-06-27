@@ -19,7 +19,9 @@ class DemoUserSeeder extends Seeder
             ['email' => 'admin@labsgg.local'],
             [
                 'name' => 'Admin Lab SGG',
+                'username' => 'admin',
                 'password' => Hash::make('password'),
+                'is_verify' => true,
             ]
         );
         $admin->assignRole(UserRole::ADMIN);
@@ -31,7 +33,9 @@ class DemoUserSeeder extends Seeder
             ['email' => 'pengajar.sutris1@labsgg.local'],
             [
                 'name' => 'Pengajar Sutris1',
+                'username' => 'pengajar.sutris1',
                 'password' => Hash::make('password'),
+                'is_verify' => true,
             ]
         );
         $pengajar1->assignRole(UserRole::PENGAJAR);
@@ -49,7 +53,9 @@ class DemoUserSeeder extends Seeder
             ['email' => 'pengajar.hidro@labsgg.local'],
             [
                 'name' => 'Pengajar Hidro',
+                'username' => 'pengajar.hidro',
                 'password' => Hash::make('password'),
+                'is_verify' => true,
             ]
         );
         $pengajar2->assignRole(UserRole::PENGAJAR);
@@ -67,7 +73,9 @@ class DemoUserSeeder extends Seeder
             ['email' => '12345678@labsgg.local'],
             [
                 'name' => 'Mahasiswa Demo',
+                'username' => '12345678',
                 'password' => Hash::make('password'),
+                'is_verify' => true,
             ]
         );
         $mhs->assignRole(UserRole::MAHASISWA);
