@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Partner;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\PartnerRequest;
 use Illuminate\Http\JsonResponse;
 
 class PartnerController extends Controller
@@ -14,15 +14,9 @@ class PartnerController extends Controller
         return $this->successResponse(Partner::orderBy('nama', 'asc')->get(), 'Partner retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(PartnerRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nama' => 'required|string',
-            'logo' => 'required|string',
-            'website' => 'nullable|url',
-            'description' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $partner = Partner::create($validated);
 
@@ -35,17 +29,11 @@ class PartnerController extends Controller
         return $this->successResponse($partner, 'Partner retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(PartnerRequest $request, $id): JsonResponse
     {
         $partner = Partner::findOrFail($id);
 
-        $validated = $request->validate([
-            'nama' => 'required|string',
-            'logo' => 'required|string',
-            'website' => 'nullable|url',
-            'description' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $partner->update($validated);
 

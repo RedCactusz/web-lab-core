@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Praktikum;
-use Illuminate\Http\Request;
+use App\Http\Requests\SuperAdmin\PraktikumRequest;
 use Illuminate\Http\JsonResponse;
 
 class PraktikumController extends Controller
@@ -14,16 +14,9 @@ class PraktikumController extends Controller
         return $this->successResponse(Praktikum::orderBy('nama')->get(), 'Praktikum retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(PraktikumRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'kode' => 'required|string|unique:praktikum,kode',
-            'nama' => 'required|string',
-            'slug' => 'required|string|unique:praktikum,slug',
-            'deskripsi' => 'nullable|string',
-            'is_active' => 'boolean',
-            'jumlah_plug' => 'nullable|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $praktikum = Praktikum::create($validated);
 
@@ -36,18 +29,11 @@ class PraktikumController extends Controller
         return $this->successResponse($praktikum, 'Praktikum retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(PraktikumRequest $request, $id): JsonResponse
     {
         $praktikum = Praktikum::findOrFail($id);
 
-        $validated = $request->validate([
-            'kode' => 'required|string|unique:praktikum,kode,' . $id,
-            'nama' => 'required|string',
-            'slug' => 'required|string|unique:praktikum,slug,' . $id,
-            'deskripsi' => 'nullable|string',
-            'is_active' => 'boolean',
-            'jumlah_plug' => 'nullable|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $praktikum->update($validated);
 

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Entities\Inventaris;
 use App\Entities\Peminjaman;
 use App\Entities\Mahasiswa;
-use Illuminate\Http\Request;
+use App\Http\Requests\Public\PeminjamanRequest;
 use Illuminate\Http\JsonResponse;
 
 class PublicPeminjamanController extends Controller
@@ -22,21 +22,9 @@ class PublicPeminjamanController extends Controller
         );
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(PeminjamanRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nim' => 'required|exists:mahasiswa,nim',
-            'nama_mahasiswa' => 'required|string',
-            'keperluan' => 'required|string',
-            'alasan_lainnya' => 'nullable|string',
-            'tanggal_pinjam' => 'required|date',
-            'jam_pinjam' => 'required|string',
-            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
-            'jam_kembali' => 'required|string',
-            'items' => 'required|array|min:1',
-            'items.*.nama_alat' => 'required|string',
-            'items.*.jumlah' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $mahasiswa = Mahasiswa::where('nim', $validated['nim'])->firstOrFail();
 

@@ -7,6 +7,8 @@ use App\Entities\Mahasiswa;
 use App\Entities\Pengajar;
 use App\Http\Requests\Api\LoginMahasiswaRequest;
 use App\Http\Requests\Api\LoginPengajarRequest;
+use App\Http\Requests\Api\RegisterMahasiswaRequest;
+use App\Http\Requests\Api\RegisterPengajarRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,17 +58,9 @@ class AuthController extends Controller
         ], 'Login berhasil');
     }
 
-    public function registerPengajar(Request $request): JsonResponse
+    public function registerPengajar(RegisterPengajarRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-            'praktikum' => 'required|string|exists:praktikum,slug',
-            'nip' => 'nullable|string|max:255',
-            'plug' => 'nullable|array',
-            'plug.*' => 'integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         // Cek apakah user dengan username ini sudah ada
         $existingUser = \App\Models\User::where('username', $validated['username'])->first();
@@ -129,13 +123,9 @@ class AuthController extends Controller
         ], 'Registrasi berhasil', 201);
     }
 
-    public function registerMahasiswa(Request $request): JsonResponse
+    public function registerMahasiswa(RegisterMahasiswaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nim' => 'required|string|unique:mahasiswa,nim',
-            'nama_lengkap' => 'required|string|max:255',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $validated = $request->validated();
 
         if (Mahasiswa::where('nim', $validated['nim'])->exists()) {
             return $this->errorResponse('NIM sudah terdaftar', 409);

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Mahasiswa;
+use App\Http\Requests\SuperAdmin\MahasiswaRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -17,14 +17,9 @@ class MahasiswaController extends Controller
         return $this->successResponse(Mahasiswa::with('user')->orderBy('nama_lengkap')->get(), 'Mahasiswa retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(MahasiswaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nim' => 'required|string|unique:mahasiswa,nim',
-            'nama_lengkap' => 'required|string',
-            'password' => 'required|string|min:6',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         return DB::transaction(function () use ($validated) {
             $nim = $validated['nim'];
@@ -58,16 +53,11 @@ class MahasiswaController extends Controller
         return $this->successResponse($mahasiswa, 'Mahasiswa retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(MahasiswaRequest $request, $id): JsonResponse
     {
         $mahasiswa = Mahasiswa::findOrFail($id);
 
-        $validated = $request->validate([
-            'nim' => 'required|string|unique:mahasiswa,nim,' . $id,
-            'nama_lengkap' => 'required|string',
-            'password' => 'nullable|string|min:6',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         return DB::transaction(function () use ($mahasiswa, $validated) {
             $nim = $validated['nim'];

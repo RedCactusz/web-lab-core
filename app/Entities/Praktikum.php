@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Praktikum extends Model
 {
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $table = 'praktikum';
 

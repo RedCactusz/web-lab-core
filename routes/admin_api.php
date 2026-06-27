@@ -23,10 +23,10 @@ use App\Http\Controllers\Public\PraktikumSelectorController;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login/pengajar', [AuthController::class, 'loginPengajar']);
-Route::post('/register/pengajar', [AuthController::class, 'registerPengajar']);
-Route::post('/super-admin/login', [SuperAdminAuthController::class, 'login']);
-Route::post('/super-admin/register', [SuperAdminAuthController::class, 'register']);
+Route::post('/login/pengajar', [AuthController::class, 'loginPengajar'])->middleware('throttle:login');
+Route::post('/register/pengajar', [AuthController::class, 'registerPengajar'])->middleware('throttle:login');
+Route::post('/super-admin/login', [SuperAdminAuthController::class, 'login'])->middleware('throttle:login');
+Route::post('/super-admin/register', [SuperAdminAuthController::class, 'register'])->middleware('throttle:login');
 Route::get('/selector/praktikum', [PraktikumSelectorController::class, 'listPraktikum']);
 
 Route::prefix('public')->group(function () {

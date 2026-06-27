@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Entities\Kerjasama;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\KerjasamaRequest;
 use Illuminate\Http\JsonResponse;
 
 class KerjasamaController extends Controller
@@ -14,16 +14,9 @@ class KerjasamaController extends Controller
         return $this->successResponse(Kerjasama::orderBy('created_at', 'desc')->get(), 'Kerjasama retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(KerjasamaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'date' => 'required|date',
-            'partner_id' => 'required|exists:partners,id',
-            'image' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $kerjasama = Kerjasama::create($validated);
 
@@ -36,18 +29,11 @@ class KerjasamaController extends Controller
         return $this->successResponse($kerjasama, 'Kerjasama retrieved');
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(KerjasamaRequest $request, $id): JsonResponse
     {
         $kerjasama = Kerjasama::findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'date' => 'required|date',
-            'partner_id' => 'required|exists:partners,id',
-            'image' => 'nullable|string',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $kerjasama->update($validated);
 
