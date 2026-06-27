@@ -11,7 +11,7 @@ class KerjasamaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Kerjasama::orderBy('created_at', 'desc')->get());
+        return $this->successResponse(Kerjasama::orderBy('created_at', 'desc')->get(), 'Kerjasama retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -27,13 +27,13 @@ class KerjasamaController extends Controller
 
         $kerjasama = Kerjasama::create($validated);
 
-        return response()->json($kerjasama, 201);
+        return $this->successResponse($kerjasama, 'Kerjasama created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $kerjasama = Kerjasama::findOrFail($id);
-        return response()->json($kerjasama);
+        return $this->successResponse($kerjasama, 'Kerjasama retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -51,7 +51,7 @@ class KerjasamaController extends Controller
 
         $kerjasama->update($validated);
 
-        return response()->json($kerjasama);
+        return $this->successResponse($kerjasama, 'Kerjasama updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -59,6 +59,6 @@ class KerjasamaController extends Controller
         $kerjasama = Kerjasama::findOrFail($id);
         $kerjasama->delete();
 
-        return response()->json(['message' => 'Kerjasama berhasil dihapus']);
+        return $this->successResponse(null, 'Kerjasama berhasil dihapus');
     }
 }

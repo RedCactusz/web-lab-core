@@ -14,7 +14,7 @@ class MahasiswaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Mahasiswa::with('user')->orderBy('nama_lengkap')->get());
+        return $this->successResponse(Mahasiswa::with('user')->orderBy('nama_lengkap')->get(), 'Mahasiswa retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -48,14 +48,14 @@ class MahasiswaController extends Controller
                 'is_active' => $validated['is_active'] ?? true,
             ]);
 
-            return response()->json($mahasiswa->load('user'), 201);
+            return $this->successResponse($mahasiswa->load('user'), 'Mahasiswa created successfully', 201);
         });
     }
 
     public function show($id): JsonResponse
     {
         $mahasiswa = Mahasiswa::with('user')->findOrFail($id);
-        return response()->json($mahasiswa);
+        return $this->successResponse($mahasiswa, 'Mahasiswa retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -90,7 +90,7 @@ class MahasiswaController extends Controller
                 'is_active' => $validated['is_active'] ?? $mahasiswa->is_active,
             ]);
 
-            return response()->json($mahasiswa->load('user'));
+            return $this->successResponse($mahasiswa->load('user'), 'Mahasiswa updated successfully');
         });
     }
 
@@ -99,7 +99,7 @@ class MahasiswaController extends Controller
         $mahasiswa = Mahasiswa::findOrFail($id);
         $mahasiswa->user->delete();
 
-        return response()->json(['message' => 'Mahasiswa berhasil dihapus']);
+        return $this->successResponse(null, 'Mahasiswa berhasil dihapus');
     }
 
     public function importCsv(Request $request): JsonResponse
@@ -112,7 +112,7 @@ class MahasiswaController extends Controller
         $handle = fopen($file->getRealPath(), 'r');
 
         if ($handle === false) {
-            return response()->json(['message' => 'Gagal membaca file CSV'], 400);
+            return $this->errorResponse('Gagal membaca file CSV', 400);
         }
 
         $results = [
@@ -194,18 +194,15 @@ class MahasiswaController extends Controller
             fclose($handle);
             DB::commit();
 
-            return response()->json([
+            return $this->successResponse([
                 'message' => 'Import selesai',
                 'results' => $results,
-            ]);
+            ], 'Import CSV selesai');
 
         } catch (\Exception $e) {
             DB::rollBack();
             fclose($handle);
-            return response()->json([
-                'message' => 'Gagal import: ' . $e->getMessage(),
-                'results' => $results,
-            ], 500);
+            return $this->errorResponse('Gagal import: ' . $e->getMessage(), 500, $results);
         }
     }
 }

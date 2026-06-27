@@ -14,7 +14,7 @@ class PengajarController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Pengajar::with('user', 'praktikum')->orderBy('nama_lengkap')->get());
+        return $this->successResponse(Pengajar::with('user', 'praktikum')->orderBy('nama_lengkap')->get(), 'Pengajar retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -48,7 +48,7 @@ class PengajarController extends Controller
                     'is_active'    => $validated['is_active'] ?? true,
                 ]);
 
-                return response()->json($pengajar->load('praktikum'), 201);
+                return $this->successResponse($pengajar->load('praktikum'), 'Pengajar created successfully', 201);
             });
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Illuminate\Support\Facades\Log::error('Validation failed for store pengajar', [
@@ -62,7 +62,7 @@ class PengajarController extends Controller
     public function show($id): JsonResponse
     {
         $pengajar = Pengajar::with('praktikum')->findOrFail($id);
-        return response()->json($pengajar);
+        return $this->successResponse($pengajar, 'Pengajar retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -97,7 +97,7 @@ class PengajarController extends Controller
                 'is_active'    => $validated['is_active'] ?? $pengajar->is_active,
             ]);
 
-            return response()->json($pengajar->load('praktikum'));
+            return $this->successResponse($pengajar->load('praktikum'), 'Pengajar updated successfully');
         });
     }
 
@@ -112,6 +112,6 @@ class PengajarController extends Controller
             $user->delete();
         }
 
-        return response()->json(['message' => 'Pengajar berhasil dihapus']);
+        return $this->successResponse(null, 'Pengajar berhasil dihapus');
     }
 }

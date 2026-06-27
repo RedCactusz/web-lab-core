@@ -14,6 +14,6 @@ class PraktikumSelectorController extends Controller
 
     public function listPraktikum(): JsonResponse
     {
-        return response()->json($this->service->listPraktikum());
+        return $this->successResponse($this->service->listPraktikum(), 'Praktikum list retrieved');
     }
 }

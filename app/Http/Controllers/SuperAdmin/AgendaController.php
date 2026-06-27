@@ -11,7 +11,7 @@ class AgendaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(AgendaItem::orderBy('date', 'asc')->get());
+        return $this->successResponse(AgendaItem::orderBy('date', 'asc')->get(), 'Agenda retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -26,13 +26,13 @@ class AgendaController extends Controller
 
         $agenda = AgendaItem::create($validated);
 
-        return response()->json($agenda, 201);
+        return $this->successResponse($agenda, 'Agenda created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $agenda = AgendaItem::findOrFail($id);
-        return response()->json($agenda);
+        return $this->successResponse($agenda, 'Agenda retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -49,7 +49,7 @@ class AgendaController extends Controller
 
         $agenda->update($validated);
 
-        return response()->json($agenda);
+        return $this->successResponse($agenda, 'Agenda updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -57,6 +57,6 @@ class AgendaController extends Controller
         $agenda = AgendaItem::findOrFail($id);
         $agenda->delete();
 
-        return response()->json(['message' => 'Agenda berhasil dihapus']);
+        return $this->successResponse(null, 'Agenda berhasil dihapus');
     }
 }

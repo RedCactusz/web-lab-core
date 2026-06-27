@@ -11,7 +11,7 @@ class InventarisController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Inventaris::orderBy('nama')->get());
+        return $this->successResponse(Inventaris::orderBy('nama')->get(), 'Inventaris retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -31,13 +31,13 @@ class InventarisController extends Controller
 
         $inventaris = Inventaris::create($validated);
 
-        return response()->json($inventaris, 201);
+        return $this->successResponse($inventaris, 'Inventaris created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $inventaris = Inventaris::findOrFail($id);
-        return response()->json($inventaris);
+        return $this->successResponse($inventaris, 'Inventaris retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -59,7 +59,7 @@ class InventarisController extends Controller
 
         $inventaris->update($validated);
 
-        return response()->json($inventaris);
+        return $this->successResponse($inventaris, 'Inventaris updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -67,6 +67,6 @@ class InventarisController extends Controller
         $inventaris = Inventaris::findOrFail($id);
         $inventaris->delete();
 
-        return response()->json(['message' => 'Inventaris berhasil dihapus']);
+        return $this->successResponse(null, 'Inventaris berhasil dihapus');
     }
 }

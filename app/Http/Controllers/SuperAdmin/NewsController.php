@@ -12,7 +12,7 @@ class NewsController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(NewsItem::orderBy('date', 'desc')->get());
+        return $this->successResponse(NewsItem::orderBy('date', 'desc')->get(), 'News retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -29,13 +29,13 @@ class NewsController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
         $news = NewsItem::create($validated);
 
-        return response()->json($news, 201);
+        return $this->successResponse($news, 'News created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $news = NewsItem::findOrFail($id);
-        return response()->json($news);
+        return $this->successResponse($news, 'News retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -59,7 +59,7 @@ class NewsController extends Controller
 
         $news->update($validated);
 
-        return response()->json($news);
+        return $this->successResponse($news, 'News updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -67,6 +67,6 @@ class NewsController extends Controller
         $news = NewsItem::findOrFail($id);
         $news->delete();
 
-        return response()->json(['message' => 'Berita berhasil dihapus']);
+        return $this->successResponse(null, 'Berita berhasil dihapus');
     }
 }

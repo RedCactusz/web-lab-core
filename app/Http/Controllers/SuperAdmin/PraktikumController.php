@@ -11,7 +11,7 @@ class PraktikumController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Praktikum::orderBy('nama')->get());
+        return $this->successResponse(Praktikum::orderBy('nama')->get(), 'Praktikum retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -27,13 +27,13 @@ class PraktikumController extends Controller
 
         $praktikum = Praktikum::create($validated);
 
-        return response()->json($praktikum, 201);
+        return $this->successResponse($praktikum, 'Praktikum created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $praktikum = Praktikum::findOrFail($id);
-        return response()->json($praktikum);
+        return $this->successResponse($praktikum, 'Praktikum retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -51,7 +51,7 @@ class PraktikumController extends Controller
 
         $praktikum->update($validated);
 
-        return response()->json($praktikum);
+        return $this->successResponse($praktikum, 'Praktikum updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -59,6 +59,6 @@ class PraktikumController extends Controller
         $praktikum = Praktikum::findOrFail($id);
         $praktikum->delete();
 
-        return response()->json(['message' => 'Praktikum berhasil dihapus']);
+        return $this->successResponse(null, 'Praktikum berhasil dihapus');
     }
 }

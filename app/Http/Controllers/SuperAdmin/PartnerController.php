@@ -11,7 +11,7 @@ class PartnerController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Partner::orderBy('nama', 'asc')->get());
+        return $this->successResponse(Partner::orderBy('nama', 'asc')->get(), 'Partner retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -26,13 +26,13 @@ class PartnerController extends Controller
 
         $partner = Partner::create($validated);
 
-        return response()->json($partner, 201);
+        return $this->successResponse($partner, 'Partner created successfully', 201);
     }
 
     public function show($id): JsonResponse
     {
         $partner = Partner::findOrFail($id);
-        return response()->json($partner);
+        return $this->successResponse($partner, 'Partner retrieved');
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -49,7 +49,7 @@ class PartnerController extends Controller
 
         $partner->update($validated);
 
-        return response()->json($partner);
+        return $this->successResponse($partner, 'Partner updated successfully');
     }
 
     public function destroy($id): JsonResponse
@@ -57,6 +57,6 @@ class PartnerController extends Controller
         $partner = Partner::findOrFail($id);
         $partner->delete();
 
-        return response()->json(['message' => 'Partner berhasil dihapus']);
+        return $this->successResponse(null, 'Partner berhasil dihapus');
     }
 }

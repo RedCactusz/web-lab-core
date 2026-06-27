@@ -44,15 +44,16 @@ class SuperAdminAuthController extends Controller
 
         $token = $user->createToken('super-admin-token')->plainTextToken;
 
-        return response()->json([
+        return $this->successResponse([
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
+                'email' => $user->email,
                 'role' => 'super-admin',
             ],
             'token' => $token,
-        ]);
+        ], 'Login berhasil');
     }
 
     public function register(Request $request): JsonResponse
@@ -75,15 +76,15 @@ class SuperAdminAuthController extends Controller
         $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
         $user->assignRole($role);
 
-        return response()->json([
+        return $this->successResponse([
             'message' => 'Registrasi berhasil. Akun Anda menunggu verifikasi administrator.',
             'user' => $user,
-        ], 201);
+        ], 'Registrasi berhasil', 201);
     }
 
     public function getStats(): JsonResponse
     {
-        return response()->json([
+        return $this->successResponse([
             'pengajar' => Pengajar::where('is_active', true)->count(),
             'mahasiswa' => Mahasiswa::where('is_active', true)->count(),
             'inventaris_baik' => Inventaris::where('kondisi', 'baik')->sum('jumlah'),
@@ -91,7 +92,7 @@ class SuperAdminAuthController extends Controller
             'peminjaman_pending' => Peminjaman::where('status', 'pending')->count(),
             'peminjaman_approved' => Peminjaman::where('status', 'approved')->count(),
             'praktikum' => Praktikum::where('is_active', true)->count(),
-        ]);
+        ], 'Stats retrieved');
     }
 
     public function checkUsername(Request $request): JsonResponse
@@ -102,9 +103,9 @@ class SuperAdminAuthController extends Controller
 
         $exists = \App\Models\User::where('username', $request->username)->exists();
 
-        return response()->json([
+        return $this->successResponse([
             'exists' => $exists,
             'available' => !$exists,
-        ]);
+        ], 'Username check retrieved');
     }
 }
