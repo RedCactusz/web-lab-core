@@ -8,6 +8,7 @@ use App\Http\Controllers\Public\PraktikumSelectorController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login/mahasiswa', [AuthController::class, 'loginMahasiswa']);
+Route::post('/register/mahasiswa', [AuthController::class, 'registerMahasiswa']);
 Route::get('/selector/praktikum', [PraktikumSelectorController::class, 'listPraktikum']);
 
 Route::prefix('public')->group(function () {

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Entities\Mahasiswa;
 use App\Entities\Pengajar;
 use App\Http\Requests\Api\LoginMahasiswaRequest;
 use App\Http\Requests\Api\LoginPengajarRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -59,7 +61,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:8|confirmed',
             'praktikum' => 'required|string|exists:praktikum,slug',
             'nip' => 'nullable|string|max:255',
             'plug' => 'nullable|array',
@@ -127,6 +129,49 @@ class AuthController extends Controller
         ], 'Registrasi berhasil', 201);
     }
 
+    public function registerMahasiswa(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'nim' => 'required|string|unique:mahasiswa,nim',
+            'nama_lengkap' => 'required|string|max:255',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if (Mahasiswa::where('nim', $validated['nim'])->exists()) {
+            return $this->errorResponse('NIM sudah terdaftar', 409);
+        }
+
+        return DB::transaction(function () use ($validated) {
+            $nim = $validated['nim'];
+            $angkatan = strlen($nim) >= 5 ? 2000 + (int)substr($nim, 3, 2) : null;
+            $email = $nim . '@student.upnyk.ac.id';
+
+            $user = \App\Models\User::create([
+                'name' => $validated['nama_lengkap'],
+                'username' => $nim,
+                'email' => $email,
+                'password' => Hash::make($validated['password']),
+                'is_verify' => true,
+            ]);
+
+            $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'mahasiswa', 'guard_name' => 'web']);
+            $user->assignRole($role);
+
+            $mahasiswa = Mahasiswa::create([
+                'user_id' => $user->id,
+                'nim' => $nim,
+                'nama_lengkap' => $validated['nama_lengkap'],
+                'angkatan' => $angkatan,
+                'is_active' => true,
+            ]);
+
+            return $this->successResponse([
+                'user' => $user,
+                'mahasiswa' => $mahasiswa,
+            ], 'Registrasi mahasiswa berhasil', 201);
+        });
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $this->authService->logout($request->user());
@@ -136,8 +181,11 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load(['pengajar', 'mahasiswa']);
+        $user = $request->user()->load(['pengajar', 'mahasiswa', 'roles']);
 
-        return $this->successResponse($user, 'User retrieved');
+        return $this->successResponse([
+            'user' => $user,
+            'role' => $user->roles->first()?->name ?? null,
+        ], 'User retrieved');
     }
 }
