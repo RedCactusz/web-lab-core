@@ -11,7 +11,8 @@ class KerjasamaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Kerjasama::orderBy('created_at', 'desc')->get(), 'Kerjasama retrieved');
+        $paginated = Kerjasama::orderBy('created_at', 'desc')->paginate(15);
+        return $this->successResponse($paginated, 'Kerjasama retrieved');
     }
 
     public function store(KerjasamaRequest $request): JsonResponse

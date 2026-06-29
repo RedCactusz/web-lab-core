@@ -11,7 +11,8 @@ class PartnerController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Partner::orderBy('nama', 'asc')->get(), 'Partner retrieved');
+        $paginated = Partner::orderBy('nama', 'asc')->paginate(15);
+        return $this->successResponse($paginated, 'Partner retrieved');
     }
 
     public function store(PartnerRequest $request): JsonResponse
