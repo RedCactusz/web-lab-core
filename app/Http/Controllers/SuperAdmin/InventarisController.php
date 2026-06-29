@@ -11,7 +11,8 @@ class InventarisController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Inventaris::orderBy('nama')->get(), 'Inventaris retrieved');
+        $paginated = Inventaris::orderBy('nama')->paginate(15);
+        return $this->successResponse($paginated, 'Inventaris retrieved');
     }
 
     public function store(InventarisRequest $request): JsonResponse

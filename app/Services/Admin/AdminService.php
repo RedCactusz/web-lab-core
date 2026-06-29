@@ -7,14 +7,14 @@ use App\Entities\Mahasiswa;
 use App\Entities\Pengajar;
 use App\Entities\Praktikum;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 
 class AdminService
 {
-    public function getAllPengajar(): Collection
+    public function getAllPengajar(): LengthAwarePaginator
     {
-        return Pengajar::with(['user', 'praktikum'])->orderBy('nama_lengkap')->get();
+        return Pengajar::with(['user', 'praktikum'])->orderBy('nama_lengkap')->paginate(15);
     }
 
     public function createPengajar(array $data): Pengajar
@@ -48,9 +48,9 @@ class AdminService
         $pengajar->user->delete();
     }
 
-    public function getAllMahasiswa(): Collection
+    public function getAllMahasiswa(): LengthAwarePaginator
     {
-        return Mahasiswa::with(['user', 'praktikum'])->orderBy('nim')->get();
+        return Mahasiswa::with(['user', 'praktikum'])->orderBy('nim')->paginate(15);
     }
 
     public function createMahasiswa(array $data): Mahasiswa
@@ -83,9 +83,9 @@ class AdminService
         $mahasiswa->user->delete();
     }
 
-    public function getAllPraktikum(): Collection
+    public function getAllPraktikum(): LengthAwarePaginator
     {
-        return Praktikum::withCount('pengajar', 'mahasiswa')->orderBy('nama')->get();
+        return Praktikum::withCount('pengajar', 'mahasiswa')->orderBy('nama')->paginate(15);
     }
 
     public function createPraktikum(array $data): Praktikum

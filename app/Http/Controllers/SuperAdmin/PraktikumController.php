@@ -11,7 +11,8 @@ class PraktikumController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Praktikum::orderBy('nama')->get(), 'Praktikum retrieved');
+        $paginated = Praktikum::orderBy('nama')->paginate(15);
+        return $this->successResponse($paginated, 'Praktikum retrieved');
     }
 
     public function store(PraktikumRequest $request): JsonResponse

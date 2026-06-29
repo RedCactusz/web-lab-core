@@ -11,7 +11,8 @@ class PeminjamanController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Peminjaman::with('mahasiswa')->orderByDesc('created_at')->get(), 'Peminjaman retrieved');
+        $paginated = Peminjaman::with('mahasiswa')->orderByDesc('created_at')->paginate(15);
+        return $this->successResponse($paginated, 'Peminjaman retrieved');
     }
 
     public function show($id): JsonResponse

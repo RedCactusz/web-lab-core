@@ -14,7 +14,8 @@ class PengajarController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Pengajar::with('user', 'praktikum')->orderBy('nama_lengkap')->get(), 'Pengajar retrieved');
+        $paginated = Pengajar::with('user', 'praktikum')->orderBy('nama_lengkap')->paginate(15);
+        return $this->successResponse($paginated, 'Pengajar retrieved');
     }
 
     public function store(PengajarRequest $request): JsonResponse

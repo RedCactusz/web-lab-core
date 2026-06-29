@@ -11,7 +11,8 @@ class GalleryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(GalleryItem::orderBy('created_at', 'desc')->get(), 'Gallery retrieved');
+        $paginated = GalleryItem::orderBy('created_at', 'desc')->paginate(15);
+        return $this->successResponse($paginated, 'Gallery retrieved');
     }
 
     public function store(GalleryRequest $request): JsonResponse

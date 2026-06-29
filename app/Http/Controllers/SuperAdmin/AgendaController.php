@@ -11,7 +11,8 @@ class AgendaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(AgendaItem::orderBy('date', 'asc')->get(), 'Agenda retrieved');
+        $paginated = AgendaItem::orderBy('date', 'asc')->paginate(15);
+        return $this->successResponse($paginated, 'Agenda retrieved');
     }
 
     public function store(AgendaRequest $request): JsonResponse

@@ -12,7 +12,8 @@ class NewsController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(NewsItem::orderBy('date', 'desc')->get(), 'News retrieved');
+        $paginated = NewsItem::orderBy('date', 'desc')->paginate(15);
+        return $this->successResponse($paginated, 'News retrieved');
     }
 
     public function store(NewsRequest $request): JsonResponse
