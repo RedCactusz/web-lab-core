@@ -18,6 +18,14 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
             'is_active' => true,
         ]);
+        Dosen::create([
+            'nama' => 'Laboran SGG Geomatika',
+            'nip' => 111111111,
+            'surel' => 'laboran@lab.test',
+            'pengampu' => 'Pemrograman Web',
+            'password' => 'password',
+            'is_active' => true,
+        ]);
 
         Mahasiswa::create([
             'nama' => 'Asisten Aktif',
