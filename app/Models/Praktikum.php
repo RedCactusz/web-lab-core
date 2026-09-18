@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -28,6 +29,16 @@ class Praktikum extends Authenticatable
             'is_active' => 'boolean',
             'praktikum_slug' => 'string',
         ];
+    }
+
+    public function jadwal(): HasMany
+    {
+        return $this->hasMany(PraktikumJadwal::class);
+    }
+
+    public function pertemuan(): HasMany
+    {
+        return $this->hasMany(PraktikumPertemuan::class);
     }
 }
 
