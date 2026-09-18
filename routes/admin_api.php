@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AlatController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\PertemuanController;
@@ -28,4 +29,8 @@ Route::middleware(['auth:sanctum', 'role:dosen,asisten'])->group(function (): vo
     Route::delete('/praktikum/{praktikum:praktikum_slug}/pertemuan/{pertemuan}', [PertemuanController::class, 'destroy']);
     Route::get('/praktikum/{praktikum:praktikum_slug}/plugs/{plug}/nilai', [PertemuanController::class, 'nilaiPlug']);
     Route::put('/praktikum/{praktikum:praktikum_slug}/plugs/{plug}/pertemuan/{pertemuan}/nilai', [PertemuanController::class, 'saveNilai']);
+    Route::get('/alat',              [AlatController::class, 'index']);
+    Route::post('/alat',             [AlatController::class, 'store']);
+    Route::put('/alat/{alat}',       [AlatController::class, 'update']);
+    Route::delete('/alat/{alat}',    [AlatController::class, 'destroy']);
 });
