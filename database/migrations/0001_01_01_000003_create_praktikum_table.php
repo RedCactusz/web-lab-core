@@ -14,18 +14,38 @@ return new class extends Migration
         Schema::create('praktikum_nama', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('praktikum');
+            $table->string('praktikum_label');
+            $table->string('praktikum_slug');
             $table->string('semester');
             $table->boolean('is_active')->default(false);
         });
         Schema::create('praktikum_jadwal', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('praktikum');
-            $table->string('plug');
-            $table->string('hari');
-            $table->string('jam');
-            $table->boolean('is_active')->default(false);
+            $table->foreignId('praktikum_id')->constrained('praktikum_nama')->cascadeOnDelete();
+            $table->string('plug', 50);
+            $table->string('hari', 10);
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+            $table->boolean('is_active')->default(true);
+        });
+        Schema::create('praktikum_pertemuan', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->foreignId('praktikum_id')->constrained('praktikum_nama')->cascadeOnDelete();
+            $table->smallInteger('nomor');
+            $table->string('topik')->nullable();
+            $table->date('tanggal')->nullable();
+            $table->smallInteger('bobot');
+            $table->jsonb('parameter');
+        });
+        Schema::create('praktikum_nilai', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->foreignId('pertemuan_id')->constrained('praktikum_pertemuan')->cascadeOnDelete();
+            $table->foreignId('mahasiswa_id')->constrained('user_mahasiswa')->cascadeOnDelete();
+            $table->jsonb('nilai');
+            $table->unique(['pertemuan_id', 'mahasiswa_id']);
         });
     }
 
@@ -34,7 +54,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('praktikum_nama');
+        Schema::dropIfExists('praktikum_nilai');
+        Schema::dropIfExists('praktikum_pertemuan');
         Schema::dropIfExists('praktikum_jadwal');
+        Schema::dropIfExists('praktikum_nama');
     }
 };

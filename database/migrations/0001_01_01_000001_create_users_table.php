@@ -18,9 +18,12 @@ return new class extends Migration
             $table->integer('nim')->unique();
             $table->string('surel')->unique();
             $table->integer('angkatan');
+            $table->jsonb('praktikum')->nullable();
+            $table->jsonb('praktikum_plug')->nullable();
+            $table->jsonb('praktikum_kelompok')->nullable();
             $table->boolean('is_asisten')->default(false);
-            $table->string('pengampu')->nullable();
-            $table->string('pengampu_plug')->nullable();
+            $table->jsonb('pengampu_praktikum')->nullable();
+            $table->jsonb('pengampu_plug')->nullable();
             $table->boolean('is_active_asisten')->default(false);
             $table->string('password');
             $table->boolean('is_active_user')->default(false);
