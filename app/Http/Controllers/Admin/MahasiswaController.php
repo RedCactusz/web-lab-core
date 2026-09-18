@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MahasiswaResource;
 use App\Models\Mahasiswa;
+use App\Services\CrudService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class MahasiswaController extends Controller
 {
+    public function __construct(private readonly CrudService $crud)
+    {
+    }
+
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -39,15 +46,47 @@ class MahasiswaController extends Controller
             ->orderBy('nim', $validated['sort_direction'] ?? 'asc')
             ->paginate(perPage: $validated['per_page'] ?? 50, page: $validated['page'] ?? null);
 
-        return response()->json([
-            'data' => MahasiswaResource::collection($mahasiswa->items()),
-            'meta' => [
-                'current_page' => $mahasiswa->currentPage(),
-                'last_page' => $mahasiswa->lastPage(),
-                'per_page' => $mahasiswa->perPage(),
-                'total' => $mahasiswa->total(),
-            ],
+        return $this->crud->paginated($mahasiswa, MahasiswaResource::class);
+    }
+
+    public function update(Request $request, Mahasiswa $mahasiswa): JsonResponse
+    {
+        $data = $request->validate([
+            'praktikum' => ['present', 'array'],
+            'praktikum.*' => ['string', 'alpha_dash', Rule::exists('praktikum_nama', 'praktikum_slug')],
+            'praktikum_plug' => ['present', 'array'],
+            'praktikum_plug.*' => ['string', 'max:50'],
         ]);
+
+        $slugs = array_values($data['praktikum']);
+        $plugs = $data['praktikum_plug'];
+
+        if (array_diff($slugs, array_keys($plugs)) !== [] || array_diff(array_keys($plugs), $slugs) !== []) {
+            return response()->json([
+                'message' => 'praktikum_plug harus memiliki key yang sama dengan praktikum.',
+            ], 422);
+        }
+
+        foreach ($plugs as $slug => $plug) {
+            $jadwalTersedia = DB::table('praktikum_jadwal')
+                ->join('praktikum_nama', 'praktikum_jadwal.praktikum_id', '=', 'praktikum_nama.id')
+                ->where('praktikum_nama.praktikum_slug', $slug)
+                ->where('praktikum_jadwal.plug', $plug)
+                ->exists();
+
+            if (! $jadwalTersedia) {
+                return response()->json([
+                    'message' => "Jadwal untuk plug {$plug} pada praktikum {$slug} belum tersedia.",
+                ], 422);
+            }
+        }
+
+        $mahasiswa->update([
+            'praktikum' => $slugs,
+            'praktikum_plug' => $plugs,
+        ]);
+
+        return response()->json(new MahasiswaResource($mahasiswa->fresh()));
     }
 
     public function importCsv(Request $request): JsonResponse

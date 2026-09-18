@@ -15,8 +15,11 @@ class MahasiswaResource extends JsonResource
             'nim' => $this->nim,
             'surel' => $this->surel,
             'angkatan' => $this->angkatan,
+            'praktikum' => $this->praktikum,
+            'praktikum_plug' => $this->praktikum_plug,
+            'praktikum_kelompok' => $this->praktikum_kelompok,
             'is_asisten' => $this->is_asisten,
-            'pengampu' => $this->pengampu,
+            'pengampu_praktikum' => $this->pengampu_praktikum,
             'pengampu_plug' => $this->pengampu_plug,
             'role' => $this->role,
         ];

@@ -12,8 +12,11 @@ use Laravel\Sanctum\HasApiTokens;
     'nim',
     'surel',
     'angkatan',
+    'praktikum',
+    'praktikum_plug',
+    'praktikum_kelompok',
     'is_asisten',
-    'pengampu',
+    'pengampu_praktikum',
     'pengampu_plug',
     'is_active_asisten',
     'password',
@@ -33,6 +36,11 @@ class Mahasiswa extends Authenticatable
             'is_asisten' => 'boolean',
             'is_active_asisten' => 'boolean',
             'is_active_user' => 'boolean',
+            'praktikum' => 'array',
+            'praktikum_plug' => 'array',
+            'praktikum_kelompok' => 'array',
+            'pengampu_praktikum' => 'array',
+            'pengampu_plug' => 'array',
         ];
     }
 
