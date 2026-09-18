@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\MahasiswaController;
+use App\Http\Controllers\Admin\PertemuanController;
 use App\Http\Controllers\Admin\PraktikumController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,10 @@ Route::middleware(['auth:sanctum', 'role:dosen,asisten'])->group(function (): vo
     Route::get('/praktikum/{praktikum}/plugs/{plug}/mahasiswa', [PraktikumController::class, 'listMahasiswa']);
     Route::put('/praktikum/{praktikum}/plugs/{plug}/mahasiswa', [PraktikumController::class, 'syncMahasiswa']);
     Route::put('/praktikum/{praktikum:praktikum_slug}/mahasiswa/{mahasiswa}/kelompok', [PraktikumController::class, 'updateKelompok']);
+    Route::get('/praktikum/{praktikum:praktikum_slug}/pertemuan',          [PertemuanController::class, 'index']);
+    Route::post('/praktikum/{praktikum:praktikum_slug}/pertemuan',         [PertemuanController::class, 'store']);
+    Route::put('/praktikum/{praktikum:praktikum_slug}/pertemuan/{pertemuan}',   [PertemuanController::class, 'update']);
+    Route::delete('/praktikum/{praktikum:praktikum_slug}/pertemuan/{pertemuan}', [PertemuanController::class, 'destroy']);
+    Route::get('/praktikum/{praktikum:praktikum_slug}/plugs/{plug}/nilai', [PertemuanController::class, 'nilaiPlug']);
+    Route::put('/praktikum/{praktikum:praktikum_slug}/plugs/{plug}/pertemuan/{pertemuan}/nilai', [PertemuanController::class, 'saveNilai']);
 });
