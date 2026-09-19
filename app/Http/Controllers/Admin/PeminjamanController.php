@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PeminjamanResource;
+use App\Models\Alat;
 use App\Models\Peminjaman;
 use App\Services\CrudService;
 use App\Services\PeminjamanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class PeminjamanController extends Controller
 {
@@ -78,7 +80,42 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Peminjaman ini tidak sedang berjalan.'], 422);
         }
 
-        $this->peminjaman->kembalikan($peminjaman);
+        $validated = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.peminjaman_alat_id' => ['required', 'integer'],
+            'items.*.kondisi' => ['required', 'array', 'min:1'],
+            'items.*.kondisi.*.status' => ['required', 'in:'.implode(',', Alat::KONDISI_STATUSES)],
+            'items.*.kondisi.*.jumlah' => ['required', 'integer', 'min:1'],
+            'items.*.kondisi.*.catatan' => ['present', 'array'],
+            'items.*.kondisi.*.catatan.*.komponen' => ['required', 'string', 'max:100'],
+            'items.*.kondisi.*.catatan.*.keterangan' => ['required', 'string', 'max:255'],
+            'items.*.ketersediaan' => ['required', 'in:tersedia,perbaikan'],
+        ]);
+
+        $items = collect($validated['items'])->keyBy('peminjaman_alat_id');
+        $pivotIds = $peminjaman->items()->pluck('id');
+
+        if ($items->keys()->diff($pivotIds)->isNotEmpty()) {
+            return response()->json(['message' => 'Item pengecekan tidak sesuai dengan peminjaman ini.'], 422);
+        }
+
+        $detail = $peminjaman->items()->with('alat')->get()->keyBy('id');
+        $errors = [];
+
+        foreach ($items as $pivotId => $item) {
+            $alat = $detail[$pivotId]->alat;
+            $totalKondisi = collect($item['kondisi'])->sum('jumlah');
+
+            if ($totalKondisi !== $alat->jumlah) {
+                $errors["items.{$pivotId}"] = "Total unit kondisi {$alat->nama_alat} harus sama dengan jumlah alat ({$alat->jumlah}).";
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        $this->peminjaman->kembalikan($peminjaman, $validated['items']);
 
         return response()->json(new PeminjamanResource($peminjaman->fresh(['items.alat'])));
     }

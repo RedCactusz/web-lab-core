@@ -110,13 +110,22 @@ class PeminjamanService
         return $peminjaman;
     }
 
-    public function kembalikan(Peminjaman $peminjaman): Peminjaman
+    /**
+     * @param  array<int, array{peminjaman_alat_id: int, kondisi: array, ketersediaan: string}>  $checkedItems
+     */
+    public function kembalikan(Peminjaman $peminjaman, array $checkedItems): Peminjaman
     {
-        return DB::transaction(function () use ($peminjaman): Peminjaman {
-            $items = $peminjaman->items()->with('alat')->get();
+        return DB::transaction(function () use ($peminjaman, $checkedItems): Peminjaman {
+            $items = collect($checkedItems)->keyBy('peminjaman_alat_id');
 
-            foreach ($items as $item) {
-                $alat = Alat::query()->whereKey($item->alat_id)->lockForUpdate()->firstOrFail();
+            foreach ($peminjaman->items()->with('alat')->get() as $pivot) {
+                $alat = Alat::query()->whereKey($pivot->alat_id)->lockForUpdate()->firstOrFail();
+
+                $checked = $items[$pivot->id];
+                $alat->update([
+                    'kondisi' => $checked['kondisi'],
+                    'ketersediaan' => $checked['ketersediaan'],
+                ]);
 
                 $this->alatLog->catat(
                     attributes: [
@@ -130,8 +139,6 @@ class PeminjamanService
                     peminjam: 'mhs',
                     refId: $peminjaman->id,
                 );
-
-                $this->sinkronKetersediaan($alat, $this->unitKeluar($alat->id, $peminjaman->id));
             }
 
             $peminjaman->update(['returned_at' => now()]);

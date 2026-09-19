@@ -17,6 +17,9 @@ class PeminjamanAlatResource extends JsonResource
             'merk' => $this->alat->merk,
             'tipe' => $this->alat->tipe,
             'jumlah' => $this->jumlah,
+            'jumlah_alat' => $this->alat->jumlah,
+            'kondisi' => $this->alat->kondisi,
+            'ketersediaan' => $this->alat->ketersediaan,
         ];
     }
 }
