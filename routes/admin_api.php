@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AlatController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\PertemuanController;
 use App\Http\Controllers\Admin\PraktikumController;
@@ -12,6 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'role:dosen,asisten'])->group(function (): void {
     Route::get('/me',                   [AuthController::class, 'me']);
     Route::post('/logout',              [AuthController::class, 'logout']);
+    Route::get('/dashboard',            [DashboardController::class, 'index']);
     Route::get('/mahasiswa',            [MahasiswaController::class, 'index']);
     Route::put('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'update']);
     Route::post('/mahasiswa/import',    [MahasiswaController::class, 'importCsv']);
