@@ -23,7 +23,7 @@ class AlatLog extends Model
 
     public function alat(): BelongsTo
     {
-        return $this->belongsTo(Alat::class, 'inventaris', 'inventaris');
+        return $this->belongsTo(Alat::class, 'inventaris', 'inventaris')->withTrashed();
     }
 
     protected function casts(): array

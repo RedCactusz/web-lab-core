@@ -23,7 +23,7 @@ class PeminjamanAlat extends Model
 
     public function alat(): BelongsTo
     {
-        return $this->belongsTo(Alat::class);
+        return $this->belongsTo(Alat::class)->withTrashed();
     }
 
     protected function casts(): array
