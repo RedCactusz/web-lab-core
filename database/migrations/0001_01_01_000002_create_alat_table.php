@@ -23,7 +23,6 @@ return new class extends Migration
             $table->json('kondisi');
             $table->string('lokasi_penyimpanan');
             $table->string('ketersediaan');
-
         });
     }
 

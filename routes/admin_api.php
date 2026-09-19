@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AlatController;
+use App\Http\Controllers\Admin\AlatLogController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MahasiswaController;
@@ -35,4 +36,5 @@ Route::middleware(['auth:sanctum', 'role:dosen,asisten'])->group(function (): vo
     Route::post('/alat',             [AlatController::class, 'store']);
     Route::put('/alat/{alat}',       [AlatController::class, 'update']);
     Route::delete('/alat/{alat}',    [AlatController::class, 'destroy']);
+    Route::get('/alat-log',          [AlatLogController::class, 'index']);
 });

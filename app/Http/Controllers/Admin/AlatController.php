@@ -5,15 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlatResource;
 use App\Models\Alat;
+use App\Services\AlatLogService;
 use App\Services\CrudService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AlatController extends Controller
 {
-    public function __construct(private readonly CrudService $crud)
-    {
+    public function __construct(
+        private readonly CrudService $crud,
+        private readonly AlatLogService $alatLog,
+    ) {
     }
 
     public function index(Request $request): JsonResponse
@@ -73,7 +77,21 @@ class AlatController extends Controller
 
     public function destroy(Alat $alat): JsonResponse
     {
-        $this->crud->destroy($alat);
+        DB::transaction(function () use ($alat): void {
+            $this->alatLog->catat(
+                attributes: [
+                    'keperluan' => 'rm',
+                    'nim_pic' => null,
+                    'nama_pic' => auth()->user()?->nama,
+                    'inventaris' => $alat->inventaris,
+                    'kondisi' => $alat->kondisi,
+                    'status' => 'keluar',
+                ],
+                peminjam: 'sys',
+            );
+
+            $alat->delete();
+        });
 
         return response()->json(null, 204);
     }
