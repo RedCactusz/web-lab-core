@@ -22,10 +22,10 @@ class PraktikumSeeder extends Seeder
             'praktikum_slug' => 'survei-terestris-2'
         ]);
         Praktikum::create([
-            'praktikum_label' => 'Survei GNSS',
-            'semester' => 'ganjil',
+            'praktikum_label' => 'Survei Rekayasa',
+            'semester' => 'genap',
             'is_active' => true,
-            'praktikum_slug' => 'survei-gnss'
+            'praktikum_slug' => 'survei-rekayasa'
         ]);
         Praktikum::create([
             'praktikum_label' => 'Survei Kadaster',
@@ -34,16 +34,17 @@ class PraktikumSeeder extends Seeder
             'praktikum_slug' => 'survei-kadaster'
         ]);
         Praktikum::create([
+            'praktikum_label' => 'Survei GNSS',
+            'semester' => 'ganjil',
+            'is_active' => true,
+            'praktikum_slug' => 'survei-gnss'
+        ]);
+        Praktikum::create([
             'praktikum_label' => 'Survei Hidrografi',
             'semester' => 'genap',
             'is_active' => true,
             'praktikum_slug' => 'survei-hidrografi'
         ]);
-        Praktikum::create([
-            'praktikum_label' => 'Survei Rekayasa',
-            'semester' => 'genap',
-            'is_active' => true,
-            'praktikum_slug' => 'survei-rekayasa'
-        ]);
+        
     }
 }
