@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatusAlatLog;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,7 @@ class AlatLog extends Model
 {
     protected $table = 'alat_log';
 
-    public const STATUS = ['keluar', 'masuk'];
+    public const STATUS = ['pengajuan', 'keluar', 'masuk', 'tambah', 'hapus', 'edit'];
 
     public function alat(): BelongsTo
     {
@@ -31,6 +32,7 @@ class AlatLog extends Model
         return [
             'nim_pic' => 'integer',
             'kondisi' => 'array',
+            'status' => StatusAlatLog::class,
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\KeperluanPeminjaman;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PeminjamanResource;
 use App\Models\Alat;
@@ -17,8 +18,7 @@ class PeminjamanController extends Controller
     public function __construct(
         private readonly PeminjamanService $peminjaman,
         private readonly CrudService $crud,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -54,7 +54,16 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Pengajuan sudah diproses.'], 422);
         }
 
-        $this->peminjaman->setujui($peminjaman, approvedBy: $request->user()->nama);
+        $user = $request->user();
+
+        if ($user->role === 'asisten'
+            && ($peminjaman->keperluan !== KeperluanPeminjaman::Praktikum
+                || ! in_array($peminjaman->praktikum_slug, $user->pengampu_praktikum ?? [], true))
+        ) {
+            return response()->json(['message' => 'Anda hanya dapat menyetujui peminjaman untuk praktikum yang Anda ampu.'], 403);
+        }
+
+        $this->peminjaman->setujui($peminjaman, approvedBy: $user->nama);
 
         return response()->json(new PeminjamanResource($peminjaman->fresh(['items.alat'])));
     }

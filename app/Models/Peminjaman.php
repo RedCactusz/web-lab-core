@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\KeperluanPeminjaman;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'nim',
     'nama',
     'keperluan',
+    'praktikum_slug',
     'status',
     'catatan',
     'approved_by',
@@ -31,6 +33,7 @@ class Peminjaman extends Model
     {
         return [
             'nim' => 'integer',
+            'keperluan' => KeperluanPeminjaman::class,
             'approved_at' => 'datetime',
             'returned_at' => 'datetime',
         ];

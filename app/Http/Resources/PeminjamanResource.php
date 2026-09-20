@@ -14,6 +14,8 @@ class PeminjamanResource extends JsonResource
             'nim' => $this->nim,
             'nama' => $this->nama,
             'keperluan' => $this->keperluan,
+            'keperluan_label' => $this->keperluan->label(),
+            'praktikum_slug' => $this->praktikum_slug,
             'status' => $this->status,
             'catatan' => $this->catatan,
             'approved_by' => $this->approved_by,

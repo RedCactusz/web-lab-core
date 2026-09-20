@@ -2,31 +2,38 @@
 
 namespace App\Services;
 
+use App\Enums\StatusAlatLog;
+use App\Enums\TipePic;
 use App\Models\AlatLog;
 use Illuminate\Support\Facades\DB;
 
 class AlatLogService
 {
     /**
-     * Catat satu event pergerakan alat.
+     * Catat satu event pergerakan/perubahan alat.
      *
-     * @param  array<string, mixed>  $attributes  kolom alat_log kecuali id_log
+     * @param  array<string, mixed>  $attributes  kolom alat_log kecuali id_log;
+     *                                            'keperluan' berisi terjemahan kode (mis. 'sewa', '-'),
+     *                                            'status' berisi StatusAlatLog
      */
-    public function catat(array $attributes, string $peminjam, ?int $refId = null): AlatLog
+    public function catat(string $kode, array $attributes, TipePic $peminjam): AlatLog
     {
+        /** @var StatusAlatLog $status */
+        $status = $attributes['status'];
+
         return AlatLog::create([
             ...$attributes,
-            'id_log' => $this->generateIdLog($attributes['keperluan'], $peminjam, $refId),
+            'id_log' => $this->generateIdLog($kode, $status, $peminjam),
         ]);
     }
 
     /**
-     * Format: {keperluan}[:{ref}]/{peminjam}/{nomor urut event per bulan}/{bulan}/{tahun}
-     * Contoh: prk:5/mhs/000001/11/2026, sw/um/000002/11/2026, rm/sys/000003/11/2026
+     * Format: {kode}:{status}/{tipe_pic}/{nomor urut event per bulan}/{bulan}/{tahun}
+     * Contoh: swa:keluar/mhs/0000001/09/2026, inv:hapus/sys/0000002/09/2026
      */
-    public function generateIdLog(string $keperluan, string $peminjam, ?int $refId = null): string
+    public function generateIdLog(string $kode, StatusAlatLog $status, TipePic $peminjam): string
     {
-        return DB::transaction(function () use ($keperluan, $peminjam, $refId) {
+        return DB::transaction(function () use ($kode, $status, $peminjam) {
             $now = now();
 
             $nomor = AlatLog::query()
@@ -35,9 +42,15 @@ class AlatLogService
                 ->distinct()
                 ->count('id_log') + 1;
 
-            $keperluan = $refId !== null ? "{$keperluan}:{$refId}" : $keperluan;
-
-            return sprintf('%s/%s/%06d/%02d/%d', $keperluan, $peminjam, $nomor, $now->month, $now->year);
+            return sprintf(
+                '%s:%s/%s/%07d/%02d/%d',
+                $kode,
+                $status->value,
+                $peminjam->value,
+                $nomor,
+                $now->month,
+                $now->year,
+            );
         });
     }
 }

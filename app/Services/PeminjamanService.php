@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\KeperluanPeminjaman;
+use App\Enums\StatusAlatLog;
+use App\Enums\TipePic;
 use App\Models\Alat;
 use App\Models\Peminjaman;
 use App\Models\PeminjamanAlat;
+use App\Models\Praktikum;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -12,21 +16,21 @@ class PeminjamanService
 {
     public function __construct(
         private readonly AlatLogService $alatLog,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<int, array{alat_id: int, jumlah: int}>  $items
      */
-    public function ajukan(int $nim, string $nama, string $keperluan, array $items): Peminjaman
+    public function ajukan(int $nim, string $nama, KeperluanPeminjaman $keperluan, ?string $praktikumSlug, array $items): Peminjaman
     {
-        return DB::transaction(function () use ($nim, $nama, $keperluan, $items): Peminjaman {
+        return DB::transaction(function () use ($nim, $nama, $keperluan, $praktikumSlug, $items): Peminjaman {
             $alatList = Alat::query()->findOrFail(collect($items)->pluck('alat_id'));
 
             $peminjaman = Peminjaman::create([
                 'nim' => $nim,
                 'nama' => $nama,
                 'keperluan' => $keperluan,
+                'praktikum_slug' => $praktikumSlug,
                 'status' => 'pending',
             ]);
 
@@ -38,6 +42,19 @@ class PeminjamanService
                     'inventaris' => $alat->inventaris,
                     'jumlah' => $item['jumlah'],
                 ]);
+
+                $this->alatLog->catat(
+                    kode: $this->kodeEvent($keperluan, $praktikumSlug),
+                    attributes: [
+                        'keperluan' => $keperluan->keterangan(),
+                        'nim_pic' => $nim,
+                        'nama_pic' => $nama,
+                        'inventaris' => $alat->inventaris,
+                        'kondisi' => $alat->kondisi,
+                        'status' => StatusAlatLog::Pengajuan,
+                    ],
+                    peminjam: TipePic::Mhs,
+                );
             }
 
             return $peminjaman;
@@ -73,18 +90,20 @@ class PeminjamanService
                 throw ValidationException::withMessages($stokErrors);
             }
 
+            $kodeEvent = $this->kodeEvent($peminjaman->keperluan, $peminjaman->praktikum_slug);
+
             foreach ($approved as $entry) {
                 $this->alatLog->catat(
+                    kode: $kodeEvent,
                     attributes: [
-                        'keperluan' => 'pjm',
+                        'keperluan' => $peminjaman->keperluan->keterangan(),
                         'nim_pic' => $peminjaman->nim,
                         'nama_pic' => $peminjaman->nama,
                         'inventaris' => $entry['alat']->inventaris,
                         'kondisi' => $entry['alat']->kondisi,
-                        'status' => 'keluar',
+                        'status' => StatusAlatLog::Keluar,
                     ],
-                    peminjam: 'mhs',
-                    refId: $peminjaman->id,
+                    peminjam: TipePic::Mhs,
                 );
 
                 $this->sinkronKetersediaan($entry['alat'], $entry['keluar_lain'] + $entry['jumlah']);
@@ -128,16 +147,16 @@ class PeminjamanService
                 ]);
 
                 $this->alatLog->catat(
+                    kode: $this->kodeEvent($peminjaman->keperluan, $peminjaman->praktikum_slug),
                     attributes: [
-                        'keperluan' => 'pjm',
+                        'keperluan' => $peminjaman->keperluan->keterangan(),
                         'nim_pic' => $peminjaman->nim,
                         'nama_pic' => $peminjaman->nama,
                         'inventaris' => $alat->inventaris,
                         'kondisi' => $alat->kondisi,
-                        'status' => 'masuk',
+                        'status' => StatusAlatLog::Masuk,
                     ],
-                    peminjam: 'mhs',
-                    refId: $peminjaman->id,
+                    peminjam: TipePic::Mhs,
                 );
             }
 
@@ -145,6 +164,25 @@ class PeminjamanService
 
             return $peminjaman;
         });
+    }
+
+    /**
+     * Kode keperluan event untuk segment pertama id_log alat_log.
+     * Untuk keperluan praktikum, kode disertai id praktikum (mis. 'prk:3').
+     */
+    private function kodeEvent(KeperluanPeminjaman $keperluan, ?string $praktikumSlug): string
+    {
+        $kode = $keperluan->kode();
+
+        if ($keperluan === KeperluanPeminjaman::Praktikum) {
+            $praktikumId = Praktikum::query()
+                ->where('praktikum_slug', $praktikumSlug)
+                ->value('id');
+
+            $kode = "{$kode}:{$praktikumId}";
+        }
+
+        return $kode;
     }
 
     /**

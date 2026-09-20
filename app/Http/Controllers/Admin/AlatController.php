@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\StatusAlatLog;
+use App\Enums\TipePic;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlatResource;
 use App\Models\Alat;
@@ -17,8 +19,7 @@ class AlatController extends Controller
     public function __construct(
         private readonly CrudService $crud,
         private readonly AlatLogService $alatLog,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -57,7 +58,24 @@ class AlatController extends Controller
             return response()->json(['message' => $error], 422);
         }
 
-        $alat = $this->crud->store(Alat::class, $data);
+        $alat = DB::transaction(function () use ($request, $data): Alat {
+            $alat = $this->crud->store(Alat::class, $data);
+
+            $this->alatLog->catat(
+                kode: 'inv',
+                attributes: [
+                    'keperluan' => '-',
+                    'nim_pic' => null,
+                    'nama_pic' => $request->user()?->nama,
+                    'inventaris' => $alat->inventaris,
+                    'kondisi' => $alat->kondisi,
+                    'status' => StatusAlatLog::Tambah,
+                ],
+                peminjam: TipePic::Sys,
+            );
+
+            return $alat;
+        });
 
         return response()->json(new AlatResource($alat), 201);
     }
@@ -70,24 +88,46 @@ class AlatController extends Controller
             return response()->json(['message' => $error], 422);
         }
 
-        $this->crud->update($alat, $data);
+        $kondisiBerubah = $data['kondisi'] !== $alat->kondisi;
 
-        return response()->json(new AlatResource($alat->fresh()));
+        $alat = DB::transaction(function () use ($request, $alat, $data, $kondisiBerubah): Alat {
+            $this->crud->update($alat, $data);
+
+            if ($kondisiBerubah) {
+                $this->alatLog->catat(
+                    kode: 'inv',
+                    attributes: [
+                        'keperluan' => '-',
+                        'nim_pic' => null,
+                        'nama_pic' => $request->user()?->nama,
+                        'inventaris' => $alat->inventaris,
+                        'kondisi' => $alat->fresh()->kondisi,
+                        'status' => StatusAlatLog::Edit,
+                    ],
+                    peminjam: TipePic::Sys,
+                );
+            }
+
+            return $alat->fresh();
+        });
+
+        return response()->json(new AlatResource($alat));
     }
 
-    public function destroy(Alat $alat): JsonResponse
+    public function destroy(Request $request, Alat $alat): JsonResponse
     {
-        DB::transaction(function () use ($alat): void {
+        DB::transaction(function () use ($request, $alat): void {
             $this->alatLog->catat(
+                kode: 'inv',
                 attributes: [
-                    'keperluan' => 'rm',
+                    'keperluan' => '-',
                     'nim_pic' => null,
-                    'nama_pic' => auth()->user()?->nama,
+                    'nama_pic' => $request->user()?->nama,
                     'inventaris' => $alat->inventaris,
                     'kondisi' => $alat->kondisi,
-                    'status' => 'keluar',
+                    'status' => StatusAlatLog::Hapus,
                 ],
-                peminjam: 'sys',
+                peminjam: TipePic::Sys,
             );
 
             $alat->delete();
